@@ -46,8 +46,8 @@ local rooms_data = {
         {
             utils.bytes({
                 '#','#','#',
-                '.','#','.',
-                '.','#','.',
+                '#','#','#',
+                '#','#','#',
             }),
             name = "empty",
             symmetry = "X",
