@@ -70,7 +70,7 @@ local OPPOSITE = { 2, 3, 0, 1 }
 ---@field wave boolean[][]
 ---@field propagator integer[][][]
 ---@field compatible integer[][][]
----@field observed integer[] | { count:integer }
+---@field observed { [integer]:integer, count:integer }
 ---@field width integer
 ---@field height integer
 ---@field tile_count integer tile count
@@ -90,8 +90,8 @@ local OPPOSITE = { 2, 3, 0, 1 }
 ---@field heuristic WFCHeuristic
 ---@field starting_entropy number
 ---@field entropies number[]
----@field screenshots? integer
----@field limit? integer
+---@field screenshots integer
+---@field limit integer
 local Model = {}
 Model.__index = Model
 
@@ -244,6 +244,8 @@ local function create_model(opt)
         size = opt.size,
         weights = {},
         propagator = {},
+        screenshots = opt.screenshots or 1,
+        limit = opt.limit or -1,
     }
 
     return setmetatable(model, Model)
@@ -296,9 +298,10 @@ function wfc.overlapping(bitmap, opt)
     local ymax = opt.periodic_input and sy or sy - n + 1
     for y = 0, ymax - 1 do
         for x = 0, xmax - 1 do
+            ---@type integer[][]
             local ps = {}
             local f = function(dx, dy)
-                local index = index0((x + dx) % sx, (y + dy) % sy, sx )
+                local index = index0((x + dx) % sx, (y + dy) % sy, sx)
                 return sample[index]
             end
 
@@ -954,9 +957,9 @@ function Model:generate(screenshots, limit, seed)
     local outputs = {}
     screenshots = screenshots or self.screenshots
     limit = limit or self.limit
-    for _ = 1, screenshots or 1 do
+    for _ = 1, screenshots do
         for _ = 1, 10 do
-            if wfc.run(self, seed or os.time(), limit or -1) then
+            if wfc.run(self, seed or math.random(os.time()), limit) then
                 table.insert(outputs, wfc.output(self))
                 break
             else
