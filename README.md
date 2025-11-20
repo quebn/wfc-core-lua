@@ -27,7 +27,7 @@ local foo = wfc_core.overlapping(bitmap, {
 local outputs = foo:generate()
 -- do whatever with the generated outputs
 ```
-see `examples/main.lua` for more examples about usage
+see `examples.lua` for more usage examples
 
 ## Acknowledgments
 

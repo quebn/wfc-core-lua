@@ -1,10 +1,49 @@
 local wfc = require("init")
-local utils = require("examples.utils")
+-- local utils = require("examples.utils")
+
+---@param model WFCModel
+local function log_model(model)
+    local printf = function(fmt, ...)
+        io.write(string.format(fmt, ...))
+    end
+    printf("WFC Model '%s' = %s: \n", model.name, model.category)
+    printf("    Width:\t  %s\n", model.width)
+    printf("    Height:\t  %s\n", model.height)
+    printf("    Tile Count:   %s\n", model.tile_count)
+    printf("    Pattern Size: %s\n", model.pattern_size)
+    printf("    Ground:\t  %s\n", model.ground)
+    printf("    Periodic:\t  %s\n", model.periodic)
+    printf("    Heuristic:\t  %s\n", model.heuristic)
+    printf("    Starting Entropy: %s\n", model.starting_entropy)
+end
+
+---@param list string[]
+---@return integer[]
+local function bytes(list)
+    for i = 1, #list do
+        ---@cast list integer[]
+        list[i] = string.byte(list[i])
+    end
+    return list
+end
+
+---@param list integer[]
+---@return string[]
+local function chars(list)
+    for i = 1, #list do
+        local char = string.char(list[i])
+        ---@cast list string[]
+        list[i] = char
+    end
+    return list
+end
+
+
 ---@type WFCTileset
 local rooms_data = {
     tiles = {
         {
-            utils.bytes({
+            bytes({
                 '#','.','.',
                 '#','.','.',
                 '#','#','#',
@@ -14,7 +53,7 @@ local rooms_data = {
             weight = 0.5,
         },
         {
-            utils.bytes({
+            bytes({
                 '.','.','#',
                 '.','.','.',
                 '.','.','.',
@@ -24,7 +63,7 @@ local rooms_data = {
             weight = 0.5,
         },
         {
-            utils.bytes({
+            bytes({
                 '.','#','.',
                 '.','#','.',
                 '.','#','.',
@@ -34,7 +73,7 @@ local rooms_data = {
             weight = 1.0,
         },
         {
-            utils.bytes({
+            bytes({
                 '#','#','#',
                 '.','#','.',
                 '.','#','.',
@@ -44,7 +83,7 @@ local rooms_data = {
             weight = 0.5,
         },
         {
-            utils.bytes({
+            bytes({
                 '#','#','#',
                 '#','#','#',
                 '#','#','#',
@@ -53,7 +92,7 @@ local rooms_data = {
             symmetry = "X",
         },
         {
-            utils.bytes({
+            bytes({
                 '#','#','#',
                 '#','#','#',
                 '.','.','.',
@@ -63,7 +102,7 @@ local rooms_data = {
             weight = 2.0,
         },
         {
-            utils.bytes({
+            bytes({
                 '.','.','.',
                 '#','#','#',
                 '.','#','.',
@@ -73,7 +112,7 @@ local rooms_data = {
             weight = 0.5,
         },
         {
-            utils.bytes({
+            bytes({
                 '#','.','#',
                 '#','.','.',
                 '#','#','#',
@@ -83,7 +122,7 @@ local rooms_data = {
             weight = 0.25,
         },
         {
-            utils.bytes({
+            bytes({
                 '.','.','.',
                 '.','.','.',
                 '.','.','.',
@@ -139,7 +178,7 @@ local rooms_data = {
 }
 
 ---@type WFCBitmap<integer>
-local flowers_data = utils.bytes({
+local flowers_data = bytes({
     ".",".",".",".",".",".",".",".",".",".",".",".",".",".",".",
     ".",".",".",".",".",".",".",".",".",".",".",".",".",".",".",
     ".",".",".",".",".","*",".",".",".",".",".",".",".","*",".",
@@ -175,19 +214,28 @@ local flowers = wfc.overlapping(flowers_data, {
     periodic = true,
     symmetry = 2,
 })
-utils.log_model(flowers)
+log_model(flowers)
 table.insert(outputs, flowers:generate())
 
 local rooms = wfc.simpletiled(rooms_data, {
     name = "Rooms",
     size = 30,
 })
-utils.log_model(rooms)
+log_model(rooms)
 table.insert(outputs, rooms:generate())
 
 print("Outputs Len:", #outputs)
 for i = 1, #outputs do
     for j = 1, #outputs[i] do
-        utils.print_bitmap(outputs[i][j])
+        io.write("{\n")
+        for y = 0, outputs[i][j].height - 1 do
+            io.write("    ")
+            for x = 0, outputs[i][j].width - 1 do
+                local index = x + y * outputs[i][j].width + 1
+                io.write(string.format("%s ", string.char(outputs[i][j][index])))
+            end
+            io.write("\n")
+        end
+        io.write("}\n")
     end
 end
