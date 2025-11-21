@@ -1,7 +1,8 @@
 ---@class WFC
----@field input_filepath? string
----@field output_dirpath? string
-local wfc = {}
+---@field count integer
+local wfc = {
+    count = 0
+}
 
 local DX = { -1, 0, 1, 0 }
 local DY = { 0, 1, 0, -1 }
@@ -231,11 +232,14 @@ local function weighted_random(weights)
 end
 
 ---@param opt WFCOpt
+---@param category WFCCategory
 ---@return WFCModel
-local function create_model(opt)
+local function create_model(opt, category)
+    wfc.count = wfc.count + 1
     ---@type WFCModel
     local model = {
-        name = opt.name,
+        category = category,
+        name = opt.name or category.." "..wfc.count,
         width = opt.width or opt.size or 24,
         height = opt.height or opt.size or 24,
         ground = opt.ground or false,
@@ -247,7 +251,6 @@ local function create_model(opt)
         screenshots = opt.screenshots or 1,
         limit = opt.limit or -1,
     }
-
     return setmetatable(model, Model)
 end
 
@@ -260,9 +263,8 @@ function wfc.overlapping(bitmap, opt)
     opt.symmetry = opt.symmetry or 8
     opt.ground =  opt.ground or false
 
-    local model = create_model(opt)
+    local model = create_model(opt, "overlapping")
     ---@cast model WFCOverlapping
-    model.category = "overlapping"
     model.pattern_size = opt.N or 3
     model.patterns = {}
     model.values = {}
@@ -352,9 +354,8 @@ end
 ---@param opt WFCSimpleTiledOpt
 ---@return WFCSimpleTiled
 function wfc.simpletiled(tileset, opt)
-    local model = create_model(opt)
+    local model = create_model(opt, "simpletiled")
     ---@cast model WFCSimpleTiled
-    model.category = "simpletiled"
     model.pattern_size = 1
 
     model.black_background = opt.black_background or false
