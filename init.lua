@@ -949,14 +949,24 @@ local function overlapping_output(model)
     return output
 end
 
+--- returns list of `WFCBitmap<number>` if `screenshots` is more than `1`
 ---@param screenshots? integer
 ---@param limit? integer
 ---@param seed? number
----@return WFCBitmap<number>[]
+---@return WFCBitmap<number>|WFCBitmap<number>[]
 function Model:generate(screenshots, limit, seed)
-    local outputs = {}
     screenshots = screenshots or self.screenshots
     limit = limit or self.limit
+    if screenshots == 1 then
+        for _ = 1, 10 do
+            if wfc.run(self, seed or math.random(os.time()), limit) then
+                return wfc.output(self)
+            else
+                print("INFO: '"..self.name.."' Contradiction!")
+            end
+        end
+    end
+    local outputs = {}
     for _ = 1, screenshots do
         for _ = 1, 10 do
             if wfc.run(self, seed or math.random(os.time()), limit) then
