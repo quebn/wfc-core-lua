@@ -93,6 +93,7 @@ local OPPOSITE = { 2, 3, 0, 1 }
 ---@field entropies number[]
 ---@field screenshots integer
 ---@field limit integer
+---@field seed integer
 local Model = {}
 Model.__index = Model
 
@@ -250,6 +251,7 @@ local function create_model(opt, category)
         propagator = {},
         screenshots = opt.screenshots or 1,
         limit = opt.limit or -1,
+        seed = opt.seed or math.random(os.time())
     }
     return setmetatable(model, Model)
 end
@@ -958,9 +960,10 @@ end
 function Model:generate(screenshots, limit, seed)
     screenshots = screenshots or self.screenshots
     limit = limit or self.limit
+    seed = seed or self.seed
     if screenshots == 1 then
         for _ = 1, 10 do
-            if wfc.run(self, seed or math.random(os.time()), limit) then
+            if wfc.run(self, seed, limit) then
                 return wfc.output(self)
             else
                 print("INFO: '"..self.name.."' Contradiction!")
@@ -968,9 +971,10 @@ function Model:generate(screenshots, limit, seed)
         end
     end
     local outputs = {}
-    for _ = 1, screenshots do
+    for i = 1, screenshots do
+        local next_seed = self.seed + i
         for _ = 1, 10 do
-            if wfc.run(self, seed or math.random(os.time()), limit) then
+            if wfc.run(self, next_seed, limit) then
                 table.insert(outputs, wfc.output(self))
                 break
             else
