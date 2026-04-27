@@ -15,7 +15,7 @@ $ git clone https://github.com/quebn/wfc-core-lua.git
 ```lua
 local wfc_core = require("wfc-core-lua")
 
--- bitmap is structures as { [integer]:integer, width:integer, height:integer } see `init.lua` for the luadoc structure definitions or can be provided by your lsp for lua.
+-- bitmap is structured as { [integer]:integer, width:integer, height:integer } see `init.lua` for the luadoc structure definition.
 local foo = wfc_core.overlapping(bitmap, {
     name = "Foo",
     N = 3,
@@ -23,7 +23,7 @@ local foo = wfc_core.overlapping(bitmap, {
     periodic = true,
     symmetry = 2,
 })
--- generate function ouputs a list of bitmap with 1 item by default
+-- generate function ouputs a list of bitmap, returns list with 1 item if no screenshot value is provided in generate function
 local outputs = foo:generate()
 -- do whatever with the generated outputs
 ```
@@ -36,4 +36,4 @@ see `examples.lua` for more usage examples
 [NWFC -  Wave Function Collapse but LÖVE ](https://github.com/MikuAuahDark/nwfc). another implementation in lua for LÖVE2D development.
 
 ## LICENSE
-MIT License, see LICENSE for further details.
+MIT License
