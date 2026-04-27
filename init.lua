@@ -28,7 +28,7 @@ local OPPOSITE = { 2, 3, 0, 1 }
 ---@class WFCSimpleTiledOpt : WFCOpt
 ---@field periodic_output? boolean
 ---@field black_background? boolean
----@field subset string[]
+---@field subset? string[]
 ---@field unique? boolean
 
 ---@class WFCTile
@@ -237,8 +237,7 @@ end
 ---@return WFCModel
 local function create_model(opt, category)
     wfc.count = wfc.count + 1
-    ---@type WFCModel
-    local model = {
+    return setmetatable({
         category = category,
         name = opt.name or category.." "..wfc.count,
         width = opt.width or opt.size or 24,
@@ -252,8 +251,7 @@ local function create_model(opt, category)
         screenshots = opt.screenshots or 1,
         limit = opt.limit or -1,
         seed = opt.seed or math.random(os.time())
-    }
-    return setmetatable(model, Model)
+    }, Model)
 end
 
 ---@param bitmap WFCBitmap<number>
@@ -956,7 +954,7 @@ end
 ---@param screenshots? integer
 ---@param limit? integer
 ---@param seed? number
----@return WFCBitmap<number>|WFCBitmap<number>[]
+---@return WFCBitmap<number>[]
 function Model:generate(screenshots, limit, seed)
     screenshots = screenshots or self.screenshots
     limit = limit or self.limit
@@ -964,7 +962,7 @@ function Model:generate(screenshots, limit, seed)
     if screenshots == 1 then
         for _ = 1, 10 do
             if wfc.run(self, seed, limit) then
-                return wfc.output(self)
+                return { wfc.output(self) }
             else
                 print("INFO: '"..self.name.."' Contradiction!")
             end

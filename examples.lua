@@ -206,6 +206,7 @@ local flowers_data = bytes({
     width = 15, height = 24,
 })
 
+---@type WFCBitmap<number>|WFCBitmap<number>[]
 local outputs = {}
 local flowers = wfc.overlapping(flowers_data, {
     name = "Flowers",
@@ -215,27 +216,33 @@ local flowers = wfc.overlapping(flowers_data, {
     symmetry = 2,
 })
 log_model(flowers)
-table.insert(outputs, flowers:generate())
+local flowers_outputs =  flowers:generate()
+for i = 1, #flowers_outputs do
+    table.insert(outputs, flowers_outputs[i])
+end
 
 local rooms = wfc.simpletiled(rooms_data, {
     name = "Rooms",
     size = 30,
 })
 log_model(rooms)
-table.insert(outputs, rooms:generate())
+local room_outputs = rooms:generate()
+for i = 1, #room_outputs do
+    table.insert(outputs, room_outputs[i])
+end
 
 print("Outputs Len:", #outputs)
 for i = 1, #outputs do
-    for j = 1, #outputs[i] do
-        io.write("{\n")
-        for y = 0, outputs[i][j].height - 1 do
-            io.write("    ")
-            for x = 0, outputs[i][j].width - 1 do
-                local index = x + y * outputs[i][j].width + 1
-                io.write(string.format("%s ", string.char(outputs[i][j][index])))
-            end
-            io.write("\n")
+    local output = outputs[i]
+    print("Output: "..#output)
+    io.write("{\n")
+    for y = 0, output.height - 1 do
+        io.write("    ")
+        for x = 0, output.width - 1 do
+            local index = x + y * output.width + 1
+            io.write(string.format("%s ", string.char(output[index])))
         end
-        io.write("}\n")
+        io.write("\n")
     end
+    io.write("}\n")
 end
